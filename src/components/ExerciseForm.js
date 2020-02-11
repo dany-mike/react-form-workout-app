@@ -6,6 +6,10 @@ import Container from 'react-bootstrap/Container'
 import ExerciseDetail from './ExerciseDetail'
 import './ExerciseForm.css'
 
+const exercise = []
+
+localStorage.setItem('exercise', JSON.stringify(exercise))
+
 
 class ExerciseForm extends React.Component {
     
@@ -19,7 +23,7 @@ class ExerciseForm extends React.Component {
             sets: '',
             id: 0,
             isSubmited: false,
-            exercise: []
+            exercise: JSON.parse(localStorage.getItem('exercise'))
         }
         this.deleteExercice = this.deleteExercice.bind(this)
     }
@@ -37,6 +41,26 @@ class ExerciseForm extends React.Component {
         this.setState({
             exercise: exercises
         })
+    }
+
+    getExercises () {
+        return this.state.exercise
+    }
+
+    editExercise(name, weight, reps, sets, exerciseName) {
+        let exercise = this.getExercises()
+
+        exercise = exercise.map(ex => {
+            if(ex.name === exerciseName) {
+                ex.name = name
+                ex.weight = weight
+                ex.reps = reps
+                ex.sets = sets
+            }
+            return ex
+        })
+
+        this.setState({exercise})
     }
 
     handleSubmit(event) {
@@ -83,17 +107,19 @@ class ExerciseForm extends React.Component {
                     <h3>Weight</h3>
                     <Form.Control type='number' name='weight'  value={this.state.weight} onChange={this.handleChange.bind(this)}/>
                     <br/>
-                    <h3>Reps</h3>
-                    <Form.Control type='number' name='reps'  value={this.state.reps} onChange={this.handleChange.bind(this)}/>
-                    <br/>
                     <h3>Sets</h3>
                     <Form.Control type='number' name='sets'  value={this.state.sets} onChange={this.handleChange.bind(this)}/>
                     <br/>
-                    <Button variant='primary' type='submit'  disabled={!isEnabled}>View the details.</Button>
+                    <h3>Reps</h3>
+                    <Form.Control type='number' name='reps'  value={this.state.reps} onChange={this.handleChange.bind(this)}/>
+                    <br/>
+                    <Button variant='primary' type='submit'  disabled={!isEnabled}>Create the exercise</Button>
+                    </form> 
                     <br/>
                     {this.state.exercise.map(ex => {
                         return (
                                 <ExerciseDetail 
+                                editExercise={this.editExercise.bind(this)}
                                 deleteExercise={this.deleteExercice}
                                 exerciseName={ex.name}
                                 dayWeek={ex.dayWeek}
@@ -103,7 +129,7 @@ class ExerciseForm extends React.Component {
                                 key={ex.id}
                                 id={ex.id}
                                 /> ) })}
-                </form>   
+               
                 </Container>
             </div>
         )
